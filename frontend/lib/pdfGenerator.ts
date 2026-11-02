@@ -454,3 +454,4 @@ export function generateTravelPlanPDF(
   const safeDest = (parsedPlan.summary.destination || "Trip").replace(/[^a-zA-Z0-9_-]/g, "_");
   doc.save(`TripMate_AI_${safeDest}_Itinerary_Guide.pdf`);
 }
+

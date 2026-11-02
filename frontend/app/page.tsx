@@ -323,6 +323,33 @@ export default function Home() {
               </div>
             )}
 
+            {/* Attractive TripMate AI PDF Dossier Banner */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-cyan-950/40 to-slate-900 border border-cyan-800/50 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="space-y-1.5 text-center sm:text-left relative z-10">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-700/60 text-cyan-300 text-[11px] font-bold uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-cyan-400" />
+                  <span>TripMate AI Travel Dossier</span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                  Download Complete Itinerary & Travel Guide (PDF)
+                </h3>
+                <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
+                  Export your full trip package offline. Includes executive trip summary, flight details, curated accommodations, day-by-day itinerary timeline, and structured budget table.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                disabled={isDownloadingPDF}
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/30 transition-all flex items-center justify-center gap-2.5 shrink-0 active:scale-95 cursor-pointer relative z-10 w-full sm:w-auto"
+              >
+                <FileDown className="w-4 h-4" />
+                <span>{isDownloadingPDF ? "Generating PDF Dossier..." : "Download PDF Guide"}</span>
+              </button>
+            </div>
+
             {/* Multi-Agent Raw State Inspector */}
             {response && <AgentInspector response={response} />}
           </div>
