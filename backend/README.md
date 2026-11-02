@@ -21,16 +21,16 @@ all coordinated through a LangGraph workflow.
 - 📝 Structured travel itinerary generation
 - 🌐 FastAPI backend with a simple web interface
 - 💾 Conversation state persistence using PostgreSQL
-- ⚡ LLM-powered responses with Groq
+- ⚡ LLM-powered responses with Google Gemini
 
 ## Tech Stack
 
 - Python 3.10+
 - FastAPI
-- Jinja2 + HTML/CSS/JavaScript frontend
+- Next.js TypeScript frontend
 - LangGraph
 - LangChain
-- Groq LLMs
+- Gemini LLMs
 - PostgreSQL
 - Tavily API
 - AviationStack API
@@ -42,8 +42,7 @@ all coordinated through a LangGraph workflow.
 ├── app.py                # FastAPI app entry point
 ├── backend.py            # LangGraph travel workflow
 ├── requirements.txt      # Python dependencies
-├── static/               # Static frontend assets
-├── templates/            # HTML templates
+├── 2 nd folder frontend(next.js)
 └── tools/                # Flight and web search integrations
 ```
 
@@ -54,7 +53,7 @@ Before running the project locally, make sure you have:
 - Python 3.10 or newer installed
 - PostgreSQL running and accessible
 - API keys for:
-  - Groq
+  - Gemini(whatever LLMs)
   - Tavily
   - AviationStack
 
@@ -64,7 +63,7 @@ Create a .env file in the project root with the following variables:
 
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/travel_db
-GROQ_API_KEY=your_groq_api_key
+Gemini_API_KEY=your_gemini_api_key
 AVIATIONSTACK_API_KEY=your_aviationstack_api_key
 TAVILY_API_KEY=your_tavily_api_key
 DEFAULT_ORIGIN_IATA=DAC
