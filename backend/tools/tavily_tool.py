@@ -4,15 +4,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = TavilyClient(
-    api_key= os.getenv("TAVILY_API_KEY")
-)
+API_KEY = os.getenv("TAVILY_API_KEY")
 
 
 def tavily_search(query):
+    if not API_KEY:
+        return (
+            "Tavily API error: TAVILY_API_KEY is missing.\n"
+            "Please add your TAVILY_API_KEY to the .env file."
+        )
+
+    client = TavilyClient(api_key=API_KEY)
     response = client.search(
-        query= query,
-        max_results= 5
+        query=query,
+        max_results=5
     )
 
     results = []
