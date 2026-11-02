@@ -1,3 +1,9 @@
 {
-  "python.defaultInterpreterPath": "C:\\Users\\mithu\\anaconda3\\envs\\travel\\python.exe"
+  "python.defaultInterpreterPath": "C:\\Users\\mithu\\anaconda3\\envs\\travel\\python.exe",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/backend"
+  ],
+  "pyrefly.extraSearchPaths": [
+    "${workspaceFolder}/backend"
+  ]
 }

@@ -1,13 +1,17 @@
 import os 
+from pathlib import Path
 import certifi
 from dotenv import load_dotenv
 
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=env_path)
 load_dotenv()
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
-from typing import TypedDict, Annotated
+from typing import Any, cast
+from typing_extensions import TypedDict, Annotated
 import operator
 import uuid
 
@@ -29,8 +33,15 @@ from langchain_core.messages import (
 )
 # pyrefly: ignore[missing-import]
 from langchain_groq import ChatGroq
-from tools.tavily_tool import tavily_search
-from tools.flight_tool import search_flights
+# pyrefly: ignore[missing-import]
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+try:
+    from tools.tavily_tool import tavily_search
+    from tools.flight_tool import search_flights
+except ImportError:
+    from backend.tools.tavily_tool import tavily_search
+    from backend.tools.flight_tool import search_flights
 
 
 def get_database_url():
@@ -48,19 +59,25 @@ def get_database_url():
     return database_url
 
 
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY is missing. Please add it to your .env file.")
-
 
 # =========================
 # LLM
 # =========================
 
-llm = ChatGroq(
-    model="llama-3.3-70b-versatile",
-    api_key=GROQ_API_KEY
-)
+if GOOGLE_API_KEY:
+    llm = ChatGoogleGenerativeAI(
+        model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        api_key=GOOGLE_API_KEY
+    )
+elif GROQ_API_KEY:
+    llm = ChatGroq(
+        model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        api_key=GROQ_API_KEY
+    )
+else:
+    raise ValueError("Missing API key. Please add GOOGLE_API_KEY or GROQ_API_KEY to your .env file.")
 
 
 # =========================
@@ -196,6 +213,7 @@ Important:
 # Build Graph
 # =========================
 
+# pyrefly: ignore[bad-specialization]
 graph = StateGraph(TravelState)
 
 graph.add_node("flight_agent", flight_agent)
@@ -215,10 +233,13 @@ graph.add_edge("final_agent", END)
 # =========================
 DATABASE_URL = get_database_url()
 
-_conn = psycopg.connect(
-    DATABASE_URL,
-    autocommit=True,
-    row_factory=dict_row
+_conn = cast(
+    psycopg.Connection[dict[str, Any]],
+    psycopg.connect(
+        DATABASE_URL,
+        autocommit=True,
+        row_factory=dict_row
+    )
 )
 
 checkpointer = PostgresSaver(_conn)

@@ -1,5 +1,7 @@
-import os 
+import os
+from pathlib import Path 
 import re 
+from typing import Mapping, Any
 import certifi
 # pyrefly: ignore[missing-import]
 import airportsdata
@@ -8,6 +10,8 @@ import pycountry
 import requests
 from dotenv import load_dotenv
 
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 load_dotenv()
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
@@ -162,7 +166,7 @@ def country_name_to_code(text: str):
 
 
 
-def airport_country_matches(airport: dict, country_code: str) -> bool:
+def airport_country_matches(airport: Mapping[str, Any], country_code: str) -> bool:
     airport_country = str(airport.get("country", "")).upper().strip()
 
     if airport_country == country_code:
