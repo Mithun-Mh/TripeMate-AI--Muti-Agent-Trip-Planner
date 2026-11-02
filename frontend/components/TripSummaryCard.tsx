@@ -14,63 +14,57 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
       label: "Destination",
       value: summary.destination,
       icon: MapPin,
-      color: "text-cyan-400 bg-cyan-950/40 border-cyan-800/40",
-      iconColor: "text-cyan-400",
+      iconColor: "text-[#159447]",
     },
     {
       label: "Departure Origin",
       value: summary.origin,
       icon: PlaneTakeoff,
-      color: "text-sky-400 bg-sky-950/40 border-sky-800/40",
-      iconColor: "text-sky-400",
+      iconColor: "text-[#F28C00]",
     },
     {
       label: "Trip Duration",
       value: summary.duration,
       icon: Clock,
-      color: "text-indigo-400 bg-indigo-950/40 border-indigo-800/40",
-      iconColor: "text-indigo-400",
+      iconColor: "text-[#159447]",
     },
     {
       label: "Travelers",
       value: summary.travelers,
       icon: Users,
-      color: "text-purple-400 bg-purple-950/40 border-purple-800/40",
-      iconColor: "text-purple-400",
+      iconColor: "text-[#F28C00]",
     },
     {
       label: "Target Budget",
       value: summary.budget,
       icon: Wallet,
-      color: "text-emerald-400 bg-emerald-950/40 border-emerald-800/40",
-      iconColor: "text-emerald-400",
+      iconColor: "text-[#159447]",
     },
     {
       label: "Travel Focus",
       value: summary.style,
       icon: Compass,
-      color: "text-amber-400 bg-amber-950/40 border-amber-800/40",
-      iconColor: "text-amber-400",
+      iconColor: "text-[#F28C00]",
     },
   ].filter((c) => Boolean(c.value));
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 sm:p-6 backdrop-blur-md">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-xs">
+    <div className="bg-white border-2 border-[#159447]/30 rounded-3xl p-6 sm:p-7 shadow-sm">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-9 h-9 rounded-xl bg-[#DDEEDD] text-[#159447] flex items-center justify-center font-extrabold text-xs">
           01
         </div>
         <div>
-          <h2 className="text-base font-bold text-slate-100 tracking-tight">
+          <h2 className="text-lg font-extrabold text-[#171717] tracking-tight">
             Trip Summary & Overview
           </h2>
-          <p className="text-xs text-slate-400">
-            Synthesized travel parameters from your planner request
+          <p className="text-xs text-[#525252]">
+            Key itinerary parameters extracted by TripMate AI
           </p>
         </div>
       </div>
 
-      {/* Grid of Key Info Cards */}
+      {/* Grid of Key Info Cards (Styled like the reference screenshot's floating pill badge) */}
       {cards.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {cards.map((card, idx) => {
@@ -78,15 +72,17 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
             return (
               <div
                 key={idx}
-                className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all hover:scale-[1.02] ${card.color}`}
+                className="p-4 rounded-2xl bg-[#FAFCFA] border border-[#DDEEDD] hover:border-[#159447] hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#159447]">
                     {card.label}
                   </span>
-                  <Icon className={`w-3.5 h-3.5 ${card.iconColor}`} />
+                  <div className="p-1 rounded-md bg-white border border-[#DDEEDD]">
+                    <Icon className={`w-3.5 h-3.5 ${card.iconColor}`} />
+                  </div>
                 </div>
-                <div className="text-xs font-semibold text-slate-100 line-clamp-2">
+                <div className="text-xs sm:text-sm font-extrabold text-[#171717] line-clamp-2">
                   {card.value}
                 </div>
               </div>
@@ -97,11 +93,10 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
 
       {/* Narrative overview if present */}
       {summary.otherText && (
-        <div className="mt-4 p-3.5 rounded-xl bg-slate-950/50 border border-slate-800/60 text-xs text-slate-300 leading-relaxed whitespace-pre-line">
+        <div className="mt-4 p-4 rounded-2xl bg-[#FBFDFB] border border-[#DDEEDD] text-xs text-[#525252] leading-relaxed whitespace-pre-line">
           {summary.otherText}
         </div>
       )}
     </div>
   );
 }
-

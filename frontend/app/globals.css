@@ -1,32 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #020617;
-  --foreground: #f8fafc;
+  --fresh-green: #159447;
+  --fresh-green-hover: #117838;
+  --orange: #F28C00;
+  --orange-hover: #d67b00;
+  --pale-green: #DDEEDD;
+  --brand-black: #171717;
+  --white: #FFFFFF;
+  --background: #FFFFFF;
+  --foreground: #171717;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #FFFFFF;
+  color: #171717;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* Custom sleek scrollbar */
+/* Custom sleek scrollbar aligned with fresh green theme */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #f4f8f4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #159447;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #117838;
 }
 
 @keyframes spinSlow {
@@ -40,4 +48,14 @@ body {
 
 .animate-spin-slow {
   animation: spinSlow 20s linear infinite;
+}
+
+@media print {
+  header, form, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
 }

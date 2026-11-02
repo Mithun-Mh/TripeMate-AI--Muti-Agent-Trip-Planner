@@ -2,7 +2,7 @@
 
 import React from "react";
 import { BudgetBreakdown } from "@/lib/types";
-import { Wallet, TrendingDown, CheckCircle2, AlertCircle } from "lucide-react";
+import { Wallet, TrendingDown, CheckCircle2 } from "lucide-react";
 
 interface BudgetSectionProps {
   budget: BudgetBreakdown;
@@ -13,20 +13,20 @@ export function BudgetSection({ budget, rawText }: BudgetSectionProps) {
   const hasTable = budget.headers.length > 0 && budget.rows.length > 0;
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 sm:p-6 backdrop-blur-md">
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-xs">
+    <div className="bg-white border-2 border-[#159447]/30 rounded-3xl p-6 sm:p-7 shadow-sm">
+      <div className="flex items-center justify-between gap-2 mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-[#DDEEDD] text-[#159447] flex items-center justify-center font-extrabold text-xs">
             05
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+            <h2 className="text-lg font-extrabold text-[#171717] flex items-center gap-2">
               <span>Estimated Budget & Cost Breakdown</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#DDEEDD] text-[#159447] border border-[#159447]/20">
                 Finance Agent
               </span>
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#525252]">
               Itemized expenses, transport, stays, and budget optimization
             </p>
           </div>
@@ -34,10 +34,10 @@ export function BudgetSection({ budget, rawText }: BudgetSectionProps) {
 
         {budget.totalCost && (
           <div className="text-right">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-              Total Estimate
+            <span className="text-[10px] uppercase font-bold text-[#525252] block tracking-wider">
+              Total Budget
             </span>
-            <span className="text-sm sm:text-base font-extrabold text-emerald-400">
+            <span className="text-base sm:text-xl font-extrabold text-[#F28C00]">
               {budget.totalCost.replace(/[*_`]/g, "")}
             </span>
           </div>
@@ -45,20 +45,20 @@ export function BudgetSection({ budget, rawText }: BudgetSectionProps) {
       </div>
 
       {budget.preNotes && (
-        <p className="text-xs text-slate-300 mb-3">{budget.preNotes.replace(/[*_`]/g, "")}</p>
+        <p className="text-xs text-[#525252] mb-3 font-medium">{budget.preNotes.replace(/[*_`]/g, "")}</p>
       )}
 
       {/* Structured Table */}
       {hasTable ? (
-        <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60">
+        <div className="overflow-x-auto rounded-2xl border border-[#DDEEDD] bg-white shadow-xs">
           <table className="w-full text-left text-xs sm:text-sm">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/80">
+              <tr className="bg-[#159447] text-white">
                 {budget.headers.map((h, idx) => (
                   <th
                     key={idx}
-                    className={`px-4 py-3 font-semibold text-slate-300 ${
-                      idx === 1 ? "text-right" : ""
+                    className={`px-5 py-3.5 font-bold tracking-tight ${
+                      idx === 0 ? "rounded-tl-2xl" : idx === budget.headers.length - 1 ? "rounded-tr-2xl" : ""
                     }`}
                   >
                     {h}
@@ -66,52 +66,44 @@ export function BudgetSection({ budget, rawText }: BudgetSectionProps) {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
-              {budget.rows.map((row, rIdx) => {
-                const isTotal = row.some((c) => c.toLowerCase().includes("total"));
-
-                return (
-                  <tr
-                    key={rIdx}
-                    className={`transition-colors ${
-                      isTotal
-                        ? "bg-emerald-950/30 font-bold text-emerald-300 border-t-2 border-emerald-500/40"
-                        : "hover:bg-slate-900/40 text-slate-300"
-                    }`}
-                  >
-                    {row.map((cell, cIdx) => (
-                      <td
-                        key={cIdx}
-                        className={`px-4 py-3 ${
-                          cIdx === 1 ? "text-right font-medium" : ""
-                        } ${isTotal ? "text-emerald-300 font-bold" : ""}`}
-                      >
-                        {cell.replace(/[*_`]/g, "")}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
+            <tbody className="divide-y divide-[#DDEEDD]">
+              {budget.rows.map((row, rIdx) => (
+                <tr
+                  key={rIdx}
+                  className={`hover:bg-[#DDEEDD]/20 transition-colors ${
+                    rIdx % 2 === 0 ? "bg-[#FAFCFA]" : "bg-white"
+                  }`}
+                >
+                  {row.map((cell, cIdx) => (
+                    <td
+                      key={cIdx}
+                      className={`px-5 py-3.5 ${
+                        cIdx === 0
+                          ? "font-extrabold text-[#171717]"
+                          : cIdx === 1
+                          ? "font-bold text-[#159447]"
+                          : "text-[#525252]"
+                      }`}
+                    >
+                      {cell.replace(/[*_`]/g, "")}
+                    </td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       ) : rawText ? (
-        <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 text-xs sm:text-sm text-slate-200 whitespace-pre-line">
-          {rawText.replace(/[*_`]/g, "")}
+        <div className="p-4 rounded-2xl bg-[#FAFCFA] border border-[#DDEEDD] text-xs sm:text-sm text-[#171717] leading-relaxed whitespace-pre-line font-medium">
+          {rawText}
         </div>
       ) : null}
 
-      {/* Budget Optimization Post Notes */}
       {budget.postNotes && (
-        <div className="mt-3.5 flex items-start gap-2 p-3 rounded-xl bg-emerald-950/20 border border-emerald-800/30 text-xs text-emerald-300">
-          <TrendingDown className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
-          <div className="leading-relaxed">
-            <span className="font-semibold text-emerald-400 mr-1.5">Cost Savings Advice:</span>
-            <span>{budget.postNotes.replace(/[*_`]/g, "")}</span>
-          </div>
-        </div>
+        <p className="mt-3 text-[11px] text-[#525252] italic font-medium">
+          * {budget.postNotes.replace(/[*_`]/g, "")}
+        </p>
       )}
     </div>
   );
 }
-

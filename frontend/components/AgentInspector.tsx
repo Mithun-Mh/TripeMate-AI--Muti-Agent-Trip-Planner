@@ -25,114 +25,114 @@ export function AgentInspector({ response }: AgentInspectorProps) {
   };
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden backdrop-blur-md">
+    <div className="bg-white border border-[#DDEEDD] rounded-2xl overflow-hidden shadow-xs">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-800/40 transition-colors"
+        className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#DDEEDD]/20 transition-colors cursor-pointer"
       >
-        <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-[#DDEEDD] text-[#159447]">
             <Terminal className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-200 block">
+            <span className="text-xs font-bold text-[#171717] block">
               Multi-Agent Graph State & Raw Output
             </span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-[#525252]">
               Session: {response.thread_id} • {response.llm_calls || 0} Agent Invocations
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#159447]">
           <span>{isOpen ? "Hide Raw Data" : "Inspect Agent State"}</span>
           {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </div>
       </button>
 
       {isOpen && (
-        <div className="p-5 border-t border-slate-800 bg-slate-950/80 space-y-3">
+        <div className="p-5 border-t border-[#DDEEDD] bg-[#FAFCFA] space-y-3">
           {/* Tabs */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#DDEEDD] pb-3">
+            <div className="flex items-center gap-1.5 overflow-x-auto">
               <button
                 type="button"
                 onClick={() => setActiveTab("final")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "final"
-                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                    ? "bg-[#159447] text-white shadow-xs"
+                    : "text-[#525252] hover:text-[#171717] hover:bg-[#DDEEDD]/40"
                 }`}
               >
-                Final Response (Agent 4)
+                Final Plan (Agent 4)
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("flights")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "flights"
-                    ? "bg-sky-500/20 text-sky-300 border border-sky-500/30"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                    ? "bg-[#159447] text-white shadow-xs"
+                    : "text-[#525252] hover:text-[#171717] hover:bg-[#DDEEDD]/40"
                 }`}
               >
-                Flight Results (Agent 1)
+                Flight Tool (Agent 1)
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("hotels")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "hotels"
-                    ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                    ? "bg-[#159447] text-white shadow-xs"
+                    : "text-[#525252] hover:text-[#171717] hover:bg-[#DDEEDD]/40"
                 }`}
               >
-                Hotel Results (Agent 2)
+                Tavily Search (Agent 2)
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("itinerary")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "itinerary"
-                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                    ? "bg-[#159447] text-white shadow-xs"
+                    : "text-[#525252] hover:text-[#171717] hover:bg-[#DDEEDD]/40"
                 }`}
               >
-                Itinerary Draft (Agent 3)
+                Gemini Itinerary (Agent 3)
               </button>
             </div>
 
             <button
               type="button"
               onClick={copyToClipboard}
-              className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700/60 hover:border-slate-600 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-[#171717] bg-white border border-[#DDEEDD] hover:border-[#159447] px-3 py-1 rounded-lg transition-colors cursor-pointer font-semibold shadow-xs"
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Copied!</span>
+                  <Check className="w-3.5 h-3.5 text-[#159447]" />
+                  <span className="text-[#159447]">Copied!</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-3.5 h-3.5" />
-                  <span>Copy Markdown</span>
+                  <span>Copy</span>
                 </>
               )}
             </button>
           </div>
 
-          {/* Raw Text Output */}
-          <div className="relative">
-            <pre className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 text-xs font-mono leading-relaxed overflow-x-auto max-h-96 whitespace-pre-wrap">
-              {activeTab === "final" && response.answer}
-              {activeTab === "flights" && (response.flight_results || "No flight results in state.")}
-              {activeTab === "hotels" && (response.hotel_results || "No hotel results in state.")}
-              {activeTab === "itinerary" && (response.itinerary || "No itinerary draft in state.")}
-            </pre>
+          {/* Raw Display Box */}
+          <div className="rounded-xl bg-[#171717] p-4 font-mono text-xs text-emerald-300 max-h-96 overflow-y-auto whitespace-pre-wrap leading-relaxed shadow-inner border border-slate-800">
+            {activeTab === "final" && (response.answer || "No final answer yet.")}
+            {activeTab === "flights" &&
+              (response.flight_results || "No raw flight results recorded.")}
+            {activeTab === "hotels" &&
+              (response.hotel_results || "No raw hotel results recorded.")}
+            {activeTab === "itinerary" &&
+              (response.itinerary || "No raw itinerary text recorded.")}
           </div>
         </div>
       )}
     </div>
   );
 }
-

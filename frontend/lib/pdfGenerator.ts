@@ -20,14 +20,16 @@ export function generateTravelPlanPDF(
 
   let y = margin;
 
-  // Color Palette
-  const primaryNavy = [15, 23, 42]; // #0f172a
-  const accentCyan = [6, 182, 212]; // #06b6d4
-  const accentIndigo = [99, 102, 241]; // #6366f1
-  const textDark = [30, 41, 59]; // #1e293b
-  const textMuted = [100, 116, 139]; // #64748b
-  const bgCard = [248, 250, 252]; // #f8fafc
-  const borderCard = [226, 232, 240]; // #e2e8f0
+  // Color Palette - Aligned with TripeMate AI Brand Reference
+  // Fresh Green: #159447 | Orange: #F28C00 | Pale Green: #DDEEDD | Black: #171717 | White: #FFFFFF
+  const brandBlack = [23, 23, 23]; // #171717
+  const freshGreen = [21, 148, 71]; // #159447
+  const brightOrange = [242, 140, 0]; // #F28C00
+  const paleGreen = [221, 238, 221]; // #DDEEDD
+  const bgCard = [250, 252, 250]; // clean soft tint
+  const borderGreen = [210, 232, 210]; // subtle light green border
+  const textDark = [23, 23, 23]; // #171717
+  const textMuted = [90, 105, 95]; // soft slate/green-grey
 
   // Helper: check page break
   function checkPageBreak(neededSpace: number) {
@@ -40,10 +42,10 @@ export function generateTravelPlanPDF(
 
   // Mini header for subsequent pages
   function drawPageHeaderMini() {
-    doc.setFillColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+    doc.setFillColor(brandBlack[0], brandBlack[1], brandBlack[2]);
     doc.rect(margin, y, contentWidth, 8, "F");
 
-    doc.setFillColor(accentCyan[0], accentCyan[1], accentCyan[2]);
+    doc.setFillColor(freshGreen[0], freshGreen[1], freshGreen[2]);
     doc.rect(margin, y, 2.5, 8, "F");
 
     doc.setFont("helvetica", "bold");
@@ -53,7 +55,7 @@ export function generateTravelPlanPDF(
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
-    doc.setTextColor(203, 213, 225);
+    doc.setTextColor(paleGreen[0], paleGreen[1], paleGreen[2]);
     const dest = parsedPlan.summary.destination || "Destination Guide";
     doc.text(dest.toUpperCase(), pageWidth - margin - 4, y + 5.5, { align: "right" });
 
@@ -63,7 +65,7 @@ export function generateTravelPlanPDF(
   // Helper: draw section header
   function drawSectionHeader(numberText: string, title: string) {
     checkPageBreak(18);
-    doc.setFillColor(accentCyan[0], accentCyan[1], accentCyan[2]);
+    doc.setFillColor(freshGreen[0], freshGreen[1], freshGreen[2]);
     doc.roundedRect(margin, y, 6, 6, 1, 1, "F");
 
     doc.setFont("helvetica", "bold");
@@ -73,11 +75,11 @@ export function generateTravelPlanPDF(
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+    doc.setTextColor(brandBlack[0], brandBlack[1], brandBlack[2]);
     doc.text(title.toUpperCase(), margin + 9, y + 4.8);
 
-    doc.setDrawColor(borderCard[0], borderCard[1], borderCard[2]);
-    doc.setLineWidth(0.3);
+    doc.setDrawColor(borderGreen[0], borderGreen[1], borderGreen[2]);
+    doc.setLineWidth(0.4);
     doc.line(margin, y + 8, margin + contentWidth, y + 8);
 
     y += 12;
@@ -109,12 +111,12 @@ export function generateTravelPlanPDF(
   // PAGE 1: HERO HEADER
   // ==========================================
   const headerHeight = 32;
-  doc.setFillColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+  doc.setFillColor(brandBlack[0], brandBlack[1], brandBlack[2]);
   doc.roundedRect(margin, y, contentWidth, headerHeight, 2, 2, "F");
 
-  // Cyan brand accent
-  doc.setFillColor(accentCyan[0], accentCyan[1], accentCyan[2]);
-  doc.roundedRect(margin, y, 3.5, headerHeight, 1, 1, "F");
+  // Fresh green brand accent bar
+  doc.setFillColor(freshGreen[0], freshGreen[1], freshGreen[2]);
+  doc.roundedRect(margin, y, 4, headerHeight, 1, 1, "F");
 
   // TripMate AI Logo text
   doc.setFont("helvetica", "bold");
@@ -122,13 +124,13 @@ export function generateTravelPlanPDF(
   doc.setTextColor(255, 255, 255);
   doc.text("TRIPMATE", margin + 8, y + 11);
 
-  doc.setTextColor(accentCyan[0], accentCyan[1], accentCyan[2]);
+  doc.setTextColor(brightOrange[0], brightOrange[1], brightOrange[2]);
   doc.text("AI", margin + 46, y + 11);
 
   // Subtitle
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
-  doc.setTextColor(203, 213, 225);
+  doc.setTextColor(paleGreen[0], paleGreen[1], paleGreen[2]);
   doc.text("Autonomous Multi-Agent Travel Planner • Official Itinerary Dossier", margin + 8, y + 17);
 
   // Metadata block (right aligned)
@@ -138,7 +140,7 @@ export function generateTravelPlanPDF(
     day: "numeric",
   });
   doc.setFontSize(7.5);
-  doc.setTextColor(148, 163, 184);
+  doc.setTextColor(180, 200, 180);
   doc.text(`Generated: ${today}`, pageWidth - margin - 6, y + 9, { align: "right" });
 
   const threadId = response?.thread_id || "session_tm_ai";
@@ -146,7 +148,7 @@ export function generateTravelPlanPDF(
     align: "right",
   });
 
-  doc.setTextColor(accentCyan[0], accentCyan[1], accentCyan[2]);
+  doc.setTextColor(freshGreen[0], freshGreen[1], freshGreen[2]);
   doc.text("Pipeline: 4 Agents Active (SerpApi • Tavily • Gemini)", pageWidth - margin - 6, y + 19, {
     align: "right",
   });
@@ -162,7 +164,7 @@ export function generateTravelPlanPDF(
   const cardHeight = 34;
 
   doc.setFillColor(bgCard[0], bgCard[1], bgCard[2]);
-  doc.setDrawColor(borderCard[0], borderCard[1], borderCard[2]);
+  doc.setDrawColor(borderGreen[0], borderGreen[1], borderGreen[2]);
   doc.setLineWidth(0.4);
   doc.roundedRect(margin, y, contentWidth, cardHeight, 2, 2, "FD");
 
@@ -190,7 +192,7 @@ export function generateTravelPlanPDF(
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
-    doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+    doc.setTextColor(brandBlack[0], brandBlack[1], brandBlack[2]);
 
     const truncated = doc.splitTextToSize(item.val, colWidth - 8)[0] || item.val;
     doc.text(truncated, itemX, itemY + 5);
@@ -209,7 +211,7 @@ export function generateTravelPlanPDF(
     const flightLines = flightTextClean.split(/\r?\n/).filter((l) => l.trim().length > 0);
 
     doc.setFillColor(bgCard[0], bgCard[1], bgCard[2]);
-    doc.setDrawColor(borderCard[0], borderCard[1], borderCard[2]);
+    doc.setDrawColor(borderGreen[0], borderGreen[1], borderGreen[2]);
     doc.setLineWidth(0.3);
 
     for (const line of flightLines.slice(0, 16)) {
@@ -217,7 +219,7 @@ export function generateTravelPlanPDF(
       if (line.startsWith("Airline:") || line.startsWith("Flight:") || line.startsWith("Departure:") || line.startsWith("Arrival:")) {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8.5);
-        doc.setTextColor(accentIndigo[0], accentIndigo[1], accentIndigo[2]);
+        doc.setTextColor(freshGreen[0], freshGreen[1], freshGreen[2]);
         doc.text(line, margin + 3, y);
         y += 4.5;
       } else {
@@ -245,7 +247,7 @@ export function generateTravelPlanPDF(
       if (/^\d+\.\s*/.test(line) || line.includes("**")) {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(8.5);
-        doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+        doc.setTextColor(brandBlack[0], brandBlack[1], brandBlack[2]);
         const cleaned = line.replace(/\*\*/g, "");
         doc.text(cleaned, margin + 3, y);
         y += 4.5;
@@ -273,8 +275,8 @@ export function generateTravelPlanPDF(
     for (const day of parsedPlan.days) {
       checkPageBreak(25);
 
-      // Day Title Pill
-      doc.setFillColor(accentIndigo[0], accentIndigo[1], accentIndigo[2]);
+      // Day Title Pill (Fresh Green with white text)
+      doc.setFillColor(freshGreen[0], freshGreen[1], freshGreen[2]);
       doc.roundedRect(margin, y, 16, 5, 1, 1, "F");
 
       doc.setFont("helvetica", "bold");
@@ -284,7 +286,7 @@ export function generateTravelPlanPDF(
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
-      doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+      doc.setTextColor(brandBlack[0], brandBlack[1], brandBlack[2]);
       const titleClean = day.title || `Day ${day.dayNumber} Exploration`;
       doc.text(titleClean, margin + 19, y + 3.8);
 
@@ -305,7 +307,7 @@ export function generateTravelPlanPDF(
 
           doc.setFont("helvetica", "bold");
           doc.setFontSize(7.5);
-          doc.setTextColor(accentCyan[0], accentCyan[1], accentCyan[2]);
+          doc.setTextColor(freshGreen[0], freshGreen[1], freshGreen[2]);
           doc.text(`• ${field.label}:`, margin + 4, y);
 
           doc.setFont("helvetica", "normal");
@@ -352,9 +354,9 @@ export function generateTravelPlanPDF(
       ? parsedPlan.budget.headers
       : ["Expense Category", "Estimated Cost", "Allocation Details"];
 
-    // Table Header
+    // Table Header (Fresh Green)
     checkPageBreak(12);
-    doc.setFillColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+    doc.setFillColor(freshGreen[0], freshGreen[1], freshGreen[2]);
     doc.rect(margin, y, contentWidth, 6.5, "F");
 
     doc.setFont("helvetica", "bold");
@@ -381,18 +383,18 @@ export function generateTravelPlanPDF(
       }
       doc.rect(margin, y, contentWidth, 6, "F");
 
-      doc.setDrawColor(borderCard[0], borderCard[1], borderCard[2]);
+      doc.setDrawColor(borderGreen[0], borderGreen[1], borderGreen[2]);
       doc.setLineWidth(0.2);
       doc.line(margin, y + 6, margin + contentWidth, y + 6);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(7);
-      doc.setTextColor(primaryNavy[0], primaryNavy[1], primaryNavy[2]);
+      doc.setTextColor(brandBlack[0], brandBlack[1], brandBlack[2]);
       doc.text(row[0] || "", margin + 3, y + 4.2);
 
-      doc.setFont("helvetica", "normal");
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(7);
-      doc.setTextColor(accentIndigo[0], accentIndigo[1], accentIndigo[2]);
+      doc.setTextColor(brightOrange[0], brightOrange[1], brightOrange[2]);
       doc.text(row[1] || "", margin + c1W + 3, y + 4.2);
 
       doc.setFont("helvetica", "normal");
@@ -434,7 +436,7 @@ export function generateTravelPlanPDF(
     doc.setPage(i);
 
     // Bottom line
-    doc.setDrawColor(borderCard[0], borderCard[1], borderCard[2]);
+    doc.setDrawColor(borderGreen[0], borderGreen[1], borderGreen[2]);
     doc.setLineWidth(0.3);
     doc.line(margin, 287, margin + contentWidth, 287);
 
