@@ -1,14 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Compass, Sparkles, Server, CheckCircle2, AlertCircle } from "lucide-react";
+import { Compass, Sparkles, Server, CheckCircle2, AlertCircle, FileDown } from "lucide-react";
 
 interface HeaderProps {
   onLoadDemo: () => void;
   isLoading: boolean;
+  onDownloadPDF?: () => void;
+  hasPlan?: boolean;
 }
 
-export function Header({ onLoadDemo, isLoading }: HeaderProps) {
+export function Header({ onLoadDemo, isLoading, onDownloadPDF, hasPlan }: HeaderProps) {
   const [backendStatus, setBackendStatus] = useState<"checking" | "online" | "offline">("checking");
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -30,7 +32,7 @@ export function Header({ onLoadDemo, isLoading }: HeaderProps) {
     }
 
     checkHealth();
-    const interval = setInterval(checkHealth, 15000);
+    const interval = setInterval(checkHealth, 5000);
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -92,15 +94,12 @@ export function Header({ onLoadDemo, isLoading }: HeaderProps) {
                   }`}
                 ></span>
               </span>
-              <span className="hidden sm:inline font-medium text-[11px]">
+              <span className="font-medium text-[11px] whitespace-nowrap">
                 {backendStatus === "online"
                   ? "FastAPI Connected"
                   : backendStatus === "offline"
                   ? "FastAPI Offline"
                   : "Checking API..."}
-              </span>
-              <span className="sm:hidden font-medium text-[11px]">
-                {backendStatus === "online" ? "API Live" : "API Offline"}
               </span>
             </button>
 
@@ -124,6 +123,19 @@ export function Header({ onLoadDemo, isLoading }: HeaderProps) {
               </div>
             )}
           </div>
+
+          {hasPlan && onDownloadPDF && (
+            <button
+              onClick={onDownloadPDF}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-md shadow-cyan-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              title="Download comprehensive TripMate AI PDF Dossier"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Export PDF</span>
+              <span className="sm:hidden">PDF</span>
+            </button>
+          )}
 
           <button
             onClick={onLoadDemo}

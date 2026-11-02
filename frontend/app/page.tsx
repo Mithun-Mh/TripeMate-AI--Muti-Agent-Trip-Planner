@@ -14,6 +14,7 @@ import { AgentInspector } from "@/components/AgentInspector";
 import { TravelResponse, ParsedTravelPlan } from "@/lib/types";
 import { parseTravelPlan } from "@/lib/parser";
 import { SAMPLE_TRAVEL_RESPONSE } from "@/lib/samplePlan";
+import { generateTravelPlanPDF } from "@/lib/pdfGenerator";
 import {
   Compass,
   Plane,
@@ -24,6 +25,7 @@ import {
   Layers,
   Sparkles,
   AlertTriangle,
+  FileDown,
 } from "lucide-react";
 
 export default function Home() {
@@ -35,6 +37,20 @@ export default function Home() {
     "all" | "flights" | "hotels" | "days" | "budget" | "tips"
   >("all");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+
+  // Trigger PDF Generation
+  const handleDownloadPDF = () => {
+    if (!parsedPlan) return;
+    setIsDownloadingPDF(true);
+    try {
+      generateTravelPlanPDF(parsedPlan, response);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setTimeout(() => setIsDownloadingPDF(false), 800);
+    }
+  };
 
   // Handle plan generation
   const handleGeneratePlan = async (queryText: string) => {
@@ -85,7 +101,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
-      <Header onLoadDemo={handleLoadDemo} isLoading={isLoading} />
+      <Header
+        onLoadDemo={handleLoadDemo}
+        isLoading={isLoading}
+        onDownloadPDF={handleDownloadPDF}
+        hasPlan={Boolean(parsedPlan)}
+      />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Hero Section */}
@@ -154,84 +175,98 @@ export default function Home() {
         {/* Results Area */}
         {parsedPlan && (
           <div className="max-w-5xl mx-auto space-y-6 pt-4 animate-in fade-in duration-500">
-            {/* View Filter Tabs */}
-            <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-slate-900/80 border border-slate-800 overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => setActiveTab("all")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-                  activeTab === "all"
-                    ? "bg-cyan-500 text-white shadow-md shadow-cyan-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Complete Itinerary</span>
-              </button>
+            {/* View Filter Tabs & PDF Action Toolbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur-xl">
+              <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("all")}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeTab === "all"
+                      ? "bg-cyan-500 text-white shadow-md shadow-cyan-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Complete Itinerary</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab("flights")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-                  activeTab === "flights"
-                    ? "bg-sky-500 text-white shadow-md shadow-sky-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
-                }`}
-              >
-                <Plane className="w-3.5 h-3.5" />
-                <span>Flights</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("flights")}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeTab === "flights"
+                      ? "bg-sky-500 text-white shadow-md shadow-sky-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                  }`}
+                >
+                  <Plane className="w-3.5 h-3.5" />
+                  <span>Flights</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab("hotels")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-                  activeTab === "hotels"
-                    ? "bg-purple-500 text-white shadow-md shadow-purple-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
-                }`}
-              >
-                <Hotel className="w-3.5 h-3.5" />
-                <span>Hotels</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("hotels")}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeTab === "hotels"
+                      ? "bg-purple-500 text-white shadow-md shadow-purple-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                  }`}
+                >
+                  <Hotel className="w-3.5 h-3.5" />
+                  <span>Hotels</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab("days")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-                  activeTab === "days"
-                    ? "bg-amber-500 text-white shadow-md shadow-amber-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
-                }`}
-              >
-                <CalendarDays className="w-3.5 h-3.5" />
-                <span>Daily Plan ({parsedPlan.days.length} Days)</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("days")}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeTab === "days"
+                      ? "bg-amber-500 text-white shadow-md shadow-amber-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                  }`}
+                >
+                  <CalendarDays className="w-3.5 h-3.5" />
+                  <span>Daily Plan ({parsedPlan.days.length} Days)</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab("budget")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-                  activeTab === "budget"
-                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
-                }`}
-              >
-                <Wallet className="w-3.5 h-3.5" />
-                <span>Estimated Budget</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("budget")}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeTab === "budget"
+                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                  }`}
+                >
+                  <Wallet className="w-3.5 h-3.5" />
+                  <span>Estimated Budget</span>
+                </button>
 
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("tips")}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                    activeTab === "tips"
+                      ? "bg-amber-500 text-white shadow-md shadow-amber-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                  }`}
+                >
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  <span>Tips & Advice</span>
+                </button>
+              </div>
+
+              {/* Quick PDF Action */}
               <button
                 type="button"
-                onClick={() => setActiveTab("tips")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-                  activeTab === "tips"
-                    ? "bg-amber-500 text-white shadow-md shadow-amber-500/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
-                }`}
+                onClick={handleDownloadPDF}
+                disabled={isDownloadingPDF}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/25 transition-all active:scale-95 shrink-0 border border-cyan-400/30 cursor-pointer"
+                title="Download complete TripMate AI itinerary guide as PDF"
               >
-                <Lightbulb className="w-3.5 h-3.5" />
-                <span>Tips & Advice</span>
+                <FileDown className="w-4 h-4" />
+                <span>{isDownloadingPDF ? "Generating PDF..." : "Download PDF Guide"}</span>
               </button>
             </div>
 
