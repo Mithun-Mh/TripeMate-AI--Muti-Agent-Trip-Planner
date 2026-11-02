@@ -257,21 +257,28 @@ graph.add_edge("final_agent", END)
 
 
 # =========================
-# PostgreSQL Checkpointer
+# Checkpointer Setup
 # =========================
-DATABASE_URL = get_database_url()
 
-_conn = cast(
-    psycopg.Connection[dict[str, Any]],
-    psycopg.connect(
-        DATABASE_URL,
-        autocommit=True,
-        row_factory=dict_row
+checkpointer = None
+try:
+    DATABASE_URL = get_database_url()
+    _conn = cast(
+        psycopg.Connection[dict[str, Any]],
+        psycopg.connect(
+            DATABASE_URL,
+            autocommit=True,
+            row_factory=dict_row,
+            connect_timeout=5
+        )
     )
-)
-
-checkpointer = PostgresSaver(_conn)
-checkpointer.setup()
+    checkpointer = PostgresSaver(_conn)
+    checkpointer.setup()
+    print("✅ PostgreSQL checkpointer initialized.")
+except Exception as exc:
+    print(f"⚠️  PostgreSQL checkpointer unavailable ({exc}). Using in-memory checkpointer fallback.")
+    from langgraph.checkpoint.memory import MemorySaver
+    checkpointer = MemorySaver()
 
 travel_graph = graph.compile(checkpointer=checkpointer)
 
