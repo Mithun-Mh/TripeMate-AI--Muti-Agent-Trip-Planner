@@ -1,5 +1,18 @@
 import os 
+import sys
 from pathlib import Path
+
+# Ensure Windows PowerShell cp1252 doesn't crash on emojis
+if sys.platform == "win32":
+    try:
+        import io
+        if hasattr(sys.stdout, "buffer"):
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "buffer"):
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import certifi
 from dotenv import load_dotenv
 
@@ -274,9 +287,9 @@ try:
     )
     checkpointer = PostgresSaver(_conn)
     checkpointer.setup()
-    print("✅ PostgreSQL checkpointer initialized.")
+    print("[OK] PostgreSQL checkpointer initialized.")
 except Exception as exc:
-    print(f"⚠️  PostgreSQL checkpointer unavailable ({exc}). Using in-memory checkpointer fallback.")
+    print(f"[WARN] PostgreSQL checkpointer unavailable ({exc}). Using in-memory checkpointer fallback.")
     from langgraph.checkpoint.memory import MemorySaver
     checkpointer = MemorySaver()
 

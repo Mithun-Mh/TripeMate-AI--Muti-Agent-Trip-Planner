@@ -57,17 +57,7 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.fallbackData) {
-          // If backend was offline, show notice and load fallback
-          setErrorMsg(
-            data.error || "FastAPI backend is offline. Showing interactive preview plan."
-          );
-          const parsed = parseTravelPlan(data.fallbackData.answer);
-          setResponse(data.fallbackData);
-          setParsedPlan(parsed);
-        } else {
-          throw new Error(data.error || "Failed to generate travel plan.");
-        }
+        throw new Error(data.error || "Failed to generate travel plan from backend.");
       } else {
         const parsed = parseTravelPlan(data.answer);
         setResponse(data);
@@ -76,10 +66,6 @@ export default function Home() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setErrorMsg(msg);
-      // Fallback to sample plan so user always sees the stunning UI
-      const parsed = parseTravelPlan(SAMPLE_TRAVEL_RESPONSE.answer);
-      setResponse(SAMPLE_TRAVEL_RESPONSE);
-      setParsedPlan(parsed);
     } finally {
       clearTimeout(timer1);
       clearTimeout(timer2);
@@ -151,6 +137,16 @@ export default function Home() {
                   cd backend && uvicorn app:app --reload
                 </code>
               </span>
+              <div className="mt-2.5">
+                <button
+                  type="button"
+                  onClick={handleLoadDemo}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-900/40 hover:bg-amber-800/60 text-amber-200 border border-amber-700/60 rounded-md text-xs font-medium transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Preview Demo Plan (Sample Data)</span>
+                </button>
+              </div>
             </div>
           </div>
         )}

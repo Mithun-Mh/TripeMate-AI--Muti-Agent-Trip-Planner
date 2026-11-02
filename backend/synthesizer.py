@@ -49,14 +49,14 @@ def extract_trip_details(query: str) -> Dict[str, str]:
         travelers = "Family (4 Travelers)"
 
     # Budget
-    budget = "Moderate / Budget-Friendly"
-    budget_match = re.search(r"(?:budget|cost)\s*(?:of|is|:)?\s*([A-Za-z$€£¥₹]+\s*[\d,]+|[\d,]+\s*[A-Za-z$€£¥₹]+)", query, re.I)
-    if budget_match:
-        budget = budget_match.group(1).strip()
-    else:
-        num_curr = re.search(r"([A-Za-z$€£¥₹]{1,4}\s*[\d,]+|[\d,]+\s*[A-Za-z$€£¥₹]{1,4})", query)
-        if num_curr:
-            budget = num_curr.group(1).strip()
+    budget = "Flexible / Standard"
+    budget_explicit = re.search(r"(?:budget|cost|under|max|total)\s*(?:of|is|:)?\s*([$€£¥₹A-Z]{1,4}\s*[\d,]+|[\d,]+\s*[$€£¥₹A-Z]{1,4})", query, re.I)
+    curr_explicit = re.search(r"([$€£¥₹]\s*[\d,]+|[\d,]+\s*[$€£¥₹]|\b(?:USD|EUR|GBP|LKR|INR|JPY|CAD|AUD)\s*[\d,]+|[\d,]+\s*(?:USD|EUR|GBP|LKR|INR|JPY|CAD|AUD)\b)", query, re.I)
+
+    if budget_explicit:
+        budget = budget_explicit.group(1).strip()
+    elif curr_explicit:
+        budget = curr_explicit.group(1).strip()
 
     # Style
     style = "Cultural Exploration & Leisure"

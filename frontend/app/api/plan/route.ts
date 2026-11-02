@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     // Try communicating with FastAPI backend
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout for multi-agent LLM reasoning
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
       const backendRes = await fetch(`${BACKEND_URL}/api/plan`, {
         method: "POST",
@@ -38,29 +38,25 @@ export async function POST(req: NextRequest) {
       } else {
         const errorText = await backendRes.text();
         console.warn("FastAPI backend error:", errorText);
-        // Fallback with backend error explanation
         return NextResponse.json(
           {
             error: `FastAPI Backend Error (${backendRes.status}): ${errorText}`,
-            fallbackAvailable: true,
           },
-          { status: 502 }
+          { status: backendRes.status || 502 }
         );
       }
     } catch (fetchErr: unknown) {
       const errMsg = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
-      console.warn("Backend unavailable, returning demo fallback guidance:", errMsg);
+      const isTimeout = fetchErr instanceof Error && fetchErr.name === "AbortError";
+      console.warn("Backend communication issue:", errMsg);
 
       return NextResponse.json(
         {
-          error: `Backend unreachable at ${BACKEND_URL}. Ensure FastAPI is running with 'uvicorn app:app --reload'.`,
-          fallbackAvailable: true,
-          fallbackData: {
-            ...SAMPLE_TRAVEL_RESPONSE,
-            answer: `> [!NOTE]\n> Showing interactive preview: The live FastAPI backend is currently offline at \`${BACKEND_URL}\`.\n\n` + SAMPLE_TRAVEL_RESPONSE.answer,
-          },
+          error: isTimeout
+            ? "Request timed out after 60s while multi-agent pipeline was running. Please ensure FastAPI backend is responsive."
+            : `Cannot connect to FastAPI backend at ${BACKEND_URL}. Please ensure your backend is started with: 'uvicorn app:app --reload --port 8000'`,
         },
-        { status: 503 }
+        { status: isTimeout ? 504 : 503 }
       );
     }
   } catch (err: unknown) {
