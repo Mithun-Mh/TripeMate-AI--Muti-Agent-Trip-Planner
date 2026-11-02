@@ -1,1 +1,5 @@
-
+search-path = [
+    ".",
+    "backend"
+]
+python-interpreter-path = "C:/Users/mithu/anaconda3/envs/travel/python.exe"
