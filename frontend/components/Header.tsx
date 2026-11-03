@@ -57,9 +57,7 @@ export function Header({ onLoadDemo, isLoading, onDownloadPDF, hasPlan }: Header
                 Multi-Agent
               </span>
             </div>
-            <p className="text-xs text-[#525252] hidden sm:block">
-              LangGraph • Gemini 3.8 • Live Flights & Hotels
-            </p>
+           
           </div>
         </div>
 

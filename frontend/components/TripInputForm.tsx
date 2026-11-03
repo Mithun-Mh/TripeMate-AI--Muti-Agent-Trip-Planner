@@ -78,7 +78,7 @@ export function TripInputForm({ onSubmit, isLoading }: TripInputFormProps) {
             <textarea
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="e.g. Plan a 10-day trip from Germany to Sri Lanka for two adults with a budget of LKR 300,000 including flights, hotels, and daily activities..."
+              placeholder="e.g. Plan a 10-day Sri Lanka trip for two adults travelling from Germany, including flights, hotels  within LKR 300,000."
               rows={3}
               disabled={isLoading}
               className="w-full bg-[#FAFCFA] border border-[#DDEEDD] focus:border-[#159447] focus:ring-2 focus:ring-[#159447]/20 rounded-2xl px-4 py-3.5 text-sm text-[#171717] placeholder:text-slate-400 outline-none transition-all resize-none shadow-xs"

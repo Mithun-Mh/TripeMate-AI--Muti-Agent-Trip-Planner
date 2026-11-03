@@ -127,11 +127,7 @@ export default function Home() {
               <span className="w-3 h-3 rounded-full bg-[#F28C00] inline-block ml-1"></span>
             </h1>
 
-            <p className="text-sm sm:text-base text-[#525252] leading-relaxed max-w-2xl mx-auto font-medium">
-              Experience next-generation travel booking where 4 specialized AI agents
-              coordinate flights, verified accommodations, day-by-day itineraries, and itemized
-              budgets in real time.
-            </p>
+            
           </div>
         </div>
 

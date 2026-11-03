@@ -16,6 +16,12 @@ if sys.platform == "win32":
 import certifi
 from dotenv import load_dotenv
 
+try:
+    import nest_asyncio
+    nest_asyncio.apply()
+except Exception:
+    pass
+
 env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
 load_dotenv()
@@ -27,6 +33,7 @@ from typing import Any, cast
 from typing_extensions import TypedDict, Annotated
 import operator
 import uuid
+import asyncio
 
 # pyrefly: ignore[missing-import]
 import psycopg
@@ -49,11 +56,13 @@ from langchain_core.messages import (
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 try:
-    from tools.tavily_tool import tavily_search
     from tools.flight_tool import search_flights
+    from tools.tavily_tool import tavily_search
+    from mcp_client import tavily_mcp_search, format_mcp_results
 except ImportError:
-    from backend.tools.tavily_tool import tavily_search
     from backend.tools.flight_tool import search_flights
+    from backend.tools.tavily_tool import tavily_search
+    from backend.mcp_client import tavily_mcp_search, format_mcp_results
 
 try:
     from synthesizer import synthesize_itinerary_content, synthesize_complete_travel_plan
@@ -131,9 +140,31 @@ def flight_agent(state: TravelState):
 # =========================
 
 def hotel_agent(state: TravelState):
-    print("🏨  [2/4] Hotel Agent: Searching accommodation via Tavily...")
+    print("🏨  [2/4] Hotel Agent: Searching accommodation via Tavily MCP...")
     query = f"Best hotels for {state['user_query']}"
-    hotel_results = tavily_search(query)
+    hotel_results = ""
+    try:
+        hotel_results = asyncio.run(tavily_mcp_search(query))
+    except Exception as mcp_err:
+        print(f"⚠️  [2/4] Hotel Agent MCP Notice: {mcp_err}. Falling back to standard Tavily search...")
+        try:
+            hotel_results = tavily_search(query)
+        except Exception as tavily_err:
+            print(f"⚠️  [2/4] Standard Tavily Search Notice: {tavily_err}")
+            hotel_results = ""
+
+    # Guarantee string type
+    if not isinstance(hotel_results, str):
+        hotel_results = format_mcp_results(hotel_results)
+
+    # If hotel results are missing, empty, or generic, synthesize curated hotels for destination
+    if not hotel_results or "option 1" in hotel_results.lower() or len(hotel_results.strip()) < 35:
+        try:
+            from synthesizer import extract_trip_details, synthesize_hotel_options
+        except ImportError:
+            from backend.synthesizer import extract_trip_details, synthesize_hotel_options
+        dest = extract_trip_details(state['user_query'])['destination']
+        hotel_results = synthesize_hotel_options(dest, state['user_query'])
 
     return {
         "hotel_results": hotel_results,
