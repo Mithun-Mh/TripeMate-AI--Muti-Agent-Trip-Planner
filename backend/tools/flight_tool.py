@@ -24,7 +24,8 @@ API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
 DEFAULT_ORIGIN_IATA = os.getenv("DEFAULT_ORIGIN_IATA", "DAC")
 
 
-BASE_URL = "https://api.aviationstack.com/v1/flights"
+# AviationStack free tier only supports plain HTTP; HTTPS triggers 'https_access_restricted'
+BASE_URL = "http://api.aviationstack.com/v1/flights"
 
 
 AIRPORTS = airportsdata.load("IATA")
@@ -65,6 +66,18 @@ COUNTRY_ALIASES = {
     "france": "FR",
     "italy": "IT",
     "spain": "ES",
+    "sri lanka": "LK",
+    "switzerland": "CH",
+    "swiss": "CH",
+    "maldives": "MV",
+    "kenya": "KE",
+    "netherlands": "NL",
+    "holland": "NL",
+    "greece": "GR",
+    "portugal": "PT",
+    "austria": "AT",
+    "egypt": "EG",
+    "morocco": "MA",
 }
 
 
@@ -92,6 +105,16 @@ COUNTRY_MAIN_AIRPORT = {
     "FR": "CDG",
     "IT": "FCO",
     "ES": "MAD",
+    "LK": "CMB",
+    "CH": "ZRH",
+    "MV": "MLE",
+    "KE": "NBO",
+    "NL": "AMS",
+    "GR": "ATH",
+    "PT": "LIS",
+    "AT": "VIE",
+    "EG": "CAI",
+    "MA": "RAK",
 }
 
 
@@ -123,6 +146,18 @@ CITY_MAIN_AIRPORT = {
     "rome": "FCO",
     "madrid": "MAD",
     "frankfurt": "FRA",
+    "munich": "MUC",
+    "berlin": "BER",
+    "colombo": "CMB",
+    "zurich": "ZRH",
+    "geneva": "GVA",
+    "male": "MLE",
+    "nairobi": "NBO",
+    "amsterdam": "AMS",
+    "athens": "ATH",
+    "lisbon": "LIS",
+    "vienna": "VIE",
+    "chicago": "ORD",
 }
 
 
@@ -197,7 +232,9 @@ def get_best_airport_for_country(country_code: str):
             continue
 
         if airport_country_matches(airport, country_code):
+            # pyrefly: ignore[unnecessary-type-conversion]
             name = str(airport.get("name", "")).lower()
+            # pyrefly: ignore[unnecessary-type-conversion]
             city = str(airport.get("city", "")).lower()
 
             score = 0
@@ -265,7 +302,9 @@ def resolve_location_to_iata(location: str):
     city_matches = []
 
     for iata, airport in AIRPORTS.items():
+        # pyrefly: ignore[unnecessary-type-conversion]
         city = str(airport.get("city", "")).lower().strip()
+        # pyrefly: ignore[unnecessary-type-conversion]
         name = str(airport.get("name", "")).lower().strip()
 
         score = 0
@@ -363,6 +402,26 @@ def parse_route(query: str):
         dep = codes[0].upper()
         arr = codes[1].upper()
         return dep, arr
+
+    # High accuracy origin and destination extraction
+    try:
+        from synthesizer import extract_origin_and_destination
+    except ImportError:
+        try:
+            from backend.synthesizer import extract_origin_and_destination
+        except ImportError:
+            extract_origin_and_destination = None
+
+    if extract_origin_and_destination:
+        orig_clean, dest_clean = extract_origin_and_destination(q)
+        dep_iata = None
+        arr_iata = None
+        if orig_clean and orig_clean != "Flexible / Local Hub":
+            dep_iata = resolve_location_to_iata(orig_clean)
+        if dest_clean and dest_clean != "Requested Destination":
+            arr_iata = resolve_location_to_iata(dest_clean)
+        if dep_iata or arr_iata:
+            return dep_iata, arr_iata
 
     # Pattern: from X to Y
     match = re.search(

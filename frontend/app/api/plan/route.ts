@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     // Try communicating with FastAPI backend
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout
 
       const backendRes = await fetch(`${BACKEND_URL}/api/plan`, {
         method: "POST",

@@ -65,9 +65,21 @@ except ImportError:
     from backend.mcp_client import tavily_mcp_search, format_mcp_results
 
 try:
-    from synthesizer import synthesize_itinerary_content, synthesize_complete_travel_plan
+    from synthesizer import (
+        synthesize_itinerary_content,
+        synthesize_complete_travel_plan,
+        extract_trip_details,
+        synthesize_hotel_options,
+        synthesize_flight_options,
+    )
 except ImportError:
-    from backend.synthesizer import synthesize_itinerary_content, synthesize_complete_travel_plan
+    from backend.synthesizer import (
+        synthesize_itinerary_content,
+        synthesize_complete_travel_plan,
+        extract_trip_details,
+        synthesize_hotel_options,
+        synthesize_flight_options,
+    )
 
 
 def get_database_url():
@@ -93,10 +105,10 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if GOOGLE_API_KEY:
     llm = ChatGoogleGenerativeAI(
-        model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
+        model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
         api_key=GOOGLE_API_KEY,
         max_retries=1,
-        timeout=25,
+        timeout=15,
     )
 
 else:
@@ -125,6 +137,11 @@ def flight_agent(state: TravelState):
     query = state["user_query"]
     flight_data = search_flights(query)
 
+    # If flight data is empty or generic error / no live data, provide route intelligence
+    if not flight_data or "no live flight data found" in flight_data.lower() or "flight api error" in flight_data.lower() or "missing" in flight_data.lower() or len(flight_data.strip()) < 40:
+        details = extract_trip_details(query)
+        flight_data = synthesize_flight_options(details["origin"], details["destination"], query)
+
     return {
         "flight_results": flight_data,
         "messages": [
@@ -141,7 +158,11 @@ def flight_agent(state: TravelState):
 
 def hotel_agent(state: TravelState):
     print("🏨  [2/4] Hotel Agent: Searching accommodation via Tavily MCP...")
-    query = f"Best hotels for {state['user_query']}"
+    details = extract_trip_details(state['user_query'])
+    dest = details['destination']
+
+    # Targeted query for Tavily search to ensure genuine hotels in the destination
+    query = f"Top recommended hotels and resorts in {dest} accommodation options with nightly rates"
     hotel_results = ""
     try:
         hotel_results = asyncio.run(tavily_mcp_search(query))
@@ -159,11 +180,6 @@ def hotel_agent(state: TravelState):
 
     # If hotel results are missing, empty, or generic, synthesize curated hotels for destination
     if not hotel_results or "option 1" in hotel_results.lower() or len(hotel_results.strip()) < 35:
-        try:
-            from synthesizer import extract_trip_details, synthesize_hotel_options
-        except ImportError:
-            from backend.synthesizer import extract_trip_details, synthesize_hotel_options
-        dest = extract_trip_details(state['user_query'])['destination']
         hotel_results = synthesize_hotel_options(dest, state['user_query'])
 
     return {
